@@ -10,3 +10,10 @@ For example:
 https://142.250.191.100.vhost-proxy.google.com.vhost-proxy.oastify.com will translate to https://142.250.191.100 with Host: google.com
 
 Also, anywhere in the response that contains "://google.com" is replaced with "://142.250.191.100.vhost-proxy.google.com.vhost-proxy.oastify.com"
+
+## Build instructions
+
+In the root of the repo:
+
+`gradle build`
+

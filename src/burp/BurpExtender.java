@@ -67,6 +67,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IProxyListene
             }
 
         } else {
+            // Message is a response
             String ORIGINAL_HOST = messageInfo.getComment();
 
             if (ORIGINAL_HOST != null && ORIGINAL_HOST.contains(SPLIT_STRING)) {
@@ -75,16 +76,29 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IProxyListene
                 String[] arrOfStr = ORIGINAL_HOST.split(SPLIT_STRING, 3);
 
                 String VHOST = arrOfStr[1];
-
-                byte[] req = messageInfo.getRequest();
-                IRequestInfo parsed = this.helpers.analyzeRequest(req);
-
+                
+                byte[] req = messageInfo.getResponse();
+                IResponseInfo parsed = this.helpers.analyzeResponse(req);
+                
                 String req_str = this.helpers.bytesToString(req);
                 String body = req_str.substring(parsed.getBodyOffset()).replace("://" + VHOST, "://" + ORIGINAL_HOST);
-
+                
                 List<String> headers = parsed.getHeaders();
+                String bad_header = "";
+                stdout.println(headers);
+                for (String header : headers) {
+                    if (header.startsWith("Location: ")) {
+                        bad_header = header;
+                        stdout.println("Discovered location header: " + bad_header);
+                    }
+                }
+                stdout.println("no error4");
+                headers.remove(bad_header);
+                headers.add(bad_header.replace(VHOST, ORIGINAL_HOST));
+                stdout.println("no error5");
                 byte[] httpRequest = this.helpers.buildHttpMessage(headers, body.getBytes());
-                messageInfo.setRequest(httpRequest);
+                messageInfo.setResponse(httpRequest);
+                
             }
 
         }
