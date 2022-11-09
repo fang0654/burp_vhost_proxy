@@ -71,7 +71,7 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IProxyListene
             String ORIGINAL_HOST = messageInfo.getComment();
 
             if (ORIGINAL_HOST != null && ORIGINAL_HOST.contains(SPLIT_STRING)) {
-                stdout.println("Got comment: " + messageInfo.getComment());
+                
 
                 String[] arrOfStr = ORIGINAL_HOST.split(SPLIT_STRING, 3);
 
@@ -85,17 +85,17 @@ public class BurpExtender implements IBurpExtender, IHttpListener, IProxyListene
                 
                 List<String> headers = parsed.getHeaders();
                 String bad_header = "";
-                stdout.println(headers);
+                
                 for (String header : headers) {
                     if (header.startsWith("Location: ")) {
                         bad_header = header;
                         stdout.println("Discovered location header: " + bad_header);
                     }
                 }
-                stdout.println("no error4");
-                headers.remove(bad_header);
-                headers.add(bad_header.replace(VHOST, ORIGINAL_HOST));
-                stdout.println("no error5");
+                if (!bad_header.equals("")) {
+                    headers.remove(bad_header);
+                    headers.add(bad_header.replace(VHOST, ORIGINAL_HOST));
+                }
                 byte[] httpRequest = this.helpers.buildHttpMessage(headers, body.getBytes());
                 messageInfo.setResponse(httpRequest);
                 
